@@ -2,7 +2,7 @@ CXX=g++
 
 CXXFLAGS=-Wall -Wextra -std=c++11
 
-TARGET=xed
+TARGET=asxe
 
 SOURCES=main.cpp
 
