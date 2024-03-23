@@ -1,23 +1,40 @@
 // Your First C++ Program
 
 #include <iostream>
+#include <map>
+using namespace std;
 
-bool first_pass();
-bool second_pass();
+class Symtab{
+    map<string, int> values;
+    map<string, int> lengths;
+};
+
+bool first_pass(Symtab & symtab);
+bool second_pass(Symtab & symtab);
+
 
 int main() {
-    first_pass();
-    second_pass();
+
+    Symtab symtab;
+
+    bool ok = first_pass(symtab);
+    if(!ok) {
+        return 1;
+    }
+    ok = second_pass(symtab);
+    if(!ok) {
+        return 1;
+    }
     return 0;
 }
 
-bool first_pass() 
+bool first_pass(Symtab & symtab) 
 {
     printf("first\n") ;
     return true;
 }
 
-bool second_pass() 
+bool second_pass(Symtab & symtab) 
 {
     printf("second\n") ;
     return true;
