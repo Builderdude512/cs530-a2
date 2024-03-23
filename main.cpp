@@ -4,6 +4,8 @@
 #include <map>
 using namespace std;
 
+// TODO: read SIC files, output ST files and I files
+
 class Symtab{
     map<string, int> values;
     map<string, int> lengths;
