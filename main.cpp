@@ -44,7 +44,8 @@ bool first_pass(Symtab & /*symtab*/, string /*flnm*/)
 bool second_pass(Symtab & /*symtab*/, string flnm) 
 {
     printf("second\n") ;
-
+    std::cout << flnm << std::endl;
+    
     fstream sicfile(flnm);
     // TODO: open file
     string line, line2;
