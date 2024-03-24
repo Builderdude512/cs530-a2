@@ -41,25 +41,6 @@ bool first_pass(Symtab & /*symtab*/, string /*flnm*/)
     return true;
 }
 
-string get_op(std::string line)
-{
-    string line2 = line.substr(10);
-    std::istringstream iss(line2);
-    string op, operand;
-    iss >> op;
-    return op;
-}
-
-string get_operand(std::string line)
-{
-    string line2 = line.substr(10);
-    std::istringstream iss(line2);
-    string op, operand;
-    iss >> op;
-    iss >> operand;
-    return operand;
-}
-
 bool second_pass(Symtab & /*symtab*/, string flnm) 
 {
     printf("second\n") ;
@@ -71,9 +52,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     string op, operand;
     while(std::getline(sicfile, line)) {
         Instruction instruct(line);
-        op = get_op(instruct.line);
-        operand = get_operand(instruct.line);
-        std::cout << op << " " << operand << std::endl;
+        std::cout << instruct.op << " " << instruct.operand << std::endl;
         // TODO: read column by column, pass1 looking for symbols, pass2 do something different for each different opcode
     }
 
