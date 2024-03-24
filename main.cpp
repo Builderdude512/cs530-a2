@@ -1,7 +1,12 @@
 // Your First C++ Program
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iomanip>
 #include <map>
+#include <vector>
 using namespace std;
 
 // TODO: read SIC files, output ST files and I files
@@ -18,6 +23,21 @@ bool second_pass(Symtab & symtab);
 int main() {
 
     Symtab symtab;
+
+    fstream sicfile;
+    // TODO: open file
+    string line, line2;
+    vector<string> holder;
+
+    while(std::getline(sicfile, line)) {
+        line2 = line.substr(10);
+        std::istringstream iss(line2);
+        string op, operand;
+        iss >> op;
+        iss >> operand;
+        // TODO: read column by column, pass1 looking for symbols, pass2 do something different for each different opcode
+    }
+
 
     bool ok = first_pass(symtab);
     if(!ok) {
