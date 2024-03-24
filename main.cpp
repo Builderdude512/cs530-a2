@@ -14,15 +14,38 @@ using namespace std;
 // TODO: read SIC files, output ST files and I files
 
 
-bool first_pass(Symtab & symtab);
-bool second_pass(Symtab & symtab);
+bool first_pass(Symtab & symtab, string flnm);
+bool second_pass(Symtab & symtab, string flnm);
 
 
 int main() {
 
     Symtab symtab;
+    string flnm = "data/files/P2sample.sic";
 
-    fstream sicfile;
+    bool ok = first_pass(symtab, flnm);
+    if(!ok) {
+        return 1;
+    }
+    ok = second_pass(symtab, flnm);
+    if(!ok) {
+        return 1;
+    }
+    return 0;
+}
+
+bool first_pass(Symtab & /*symtab*/, string /*flnm*/) 
+{
+    printf("first\n") ;
+    // TODO: read all lines, looking for symbols, put length and value to symbol table
+    return true;
+}
+
+bool second_pass(Symtab & /*symtab*/, string flnm) 
+{
+    printf("second\n") ;
+
+    fstream sicfile(flnm);
     // TODO: open file
     string line, line2;
     vector<string> holder;
@@ -36,28 +59,6 @@ int main() {
         // TODO: read column by column, pass1 looking for symbols, pass2 do something different for each different opcode
     }
 
-
-    bool ok = first_pass(symtab);
-    if(!ok) {
-        return 1;
-    }
-    ok = second_pass(symtab);
-    if(!ok) {
-        return 1;
-    }
-    return 0;
-}
-
-bool first_pass(Symtab & /*symtab*/) 
-{
-    printf("first\n") ;
-    // TODO: read all lines, looking for symbols, put length and value to symbol table
-    return true;
-}
-
-bool second_pass(Symtab & /*symtab*/) 
-{
-    printf("second\n") ;
     // TODO: read each line and output assembly statement for each line
     // TODO: handle start statement
     // TODO: handle LDX
