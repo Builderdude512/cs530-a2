@@ -7,14 +7,12 @@
 #include <iomanip>
 #include <map>
 #include <vector>
+#include "instruction.hpp"
+#include "symtab.hpp"
 using namespace std;
 
 // TODO: read SIC files, output ST files and I files
 
-class Symtab{
-    map<string, int> values;
-    map<string, int> lengths;
-};
 
 bool first_pass(Symtab & symtab);
 bool second_pass(Symtab & symtab);
@@ -50,14 +48,14 @@ int main() {
     return 0;
 }
 
-bool first_pass(Symtab & symtab) 
+bool first_pass(Symtab & /*symtab*/) 
 {
     printf("first\n") ;
     // TODO: read all lines, looking for symbols, put length and value to symbol table
     return true;
 }
 
-bool second_pass(Symtab & symtab) 
+bool second_pass(Symtab & /*symtab*/) 
 {
     printf("second\n") ;
     // TODO: read each line and output assembly statement for each line
