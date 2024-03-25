@@ -37,7 +37,7 @@ int main() {
 bool first_pass(Symtab & /*symtab*/, string /*flnm*/) 
 {
     printf("first\n") ;
-    // TODO: read all lines, looking for symbols, put length and value to symbol table
+    // TODO: read all lines, looking for symbols, put length and value to symbol table, to be done in the future
     return true;
 }
 
@@ -53,27 +53,10 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     while(std::getline(sicfile, line)) {
         Instruction instruct(line);
         std::cout << instruct.op << " " << instruct.operand << std::endl;
-        // TODO: read column by column, pass1 looking for symbols, pass2 do something different for each different opcode
+        // TODO: at this point i've passed the op and operand to Instruction
     }
 
-    // TODO: read each line and output assembly statement for each line
-    // TODO: handle start statement
-    // TODO: handle LDX
-    // TODO: handle LDA
-    // TODO: handle +LDB
-    // TODO: handle BASE
-    // TODO: handle ADD
-    // TODO: handle ADD
-    // TODO: handle TIX
-    // TODO: handle JLT
-    // TODO: handle +STA
-    // TODO: handle RSUB
-    // TODO: handle +LDA
-    // TODO: handle RESW
-    // TODO: handle RESW
-    // TODO: handle RESW
-    // TODO: handle RESW
-    // TODO: handle =C'EOF'
-    // TODO: handle END
+    
+    
     return true;
 }
