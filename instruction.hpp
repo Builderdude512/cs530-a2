@@ -1,30 +1,17 @@
 #ifndef INSTRUCTION_HPP
 #define INSTRUCTION_HPP
+#include "typedef.hpp"
 #include <map>
 #include <string>
 
-std::string get_op(std::string line)
-{
-    std::string line2 = line.substr(10);
-    std::istringstream iss(line2);
-    std::string op, operand;
-    iss >> op;
-    return op;
-}
+std::string get_op(std::string line);
 
-std::string get_operand(std::string line)
-{
-    std::string line2 = line.substr(10);
-    std::istringstream iss(line2);
-    std::string op, operand;
-    iss >> op;
-    iss >> operand;
-    return operand;
-}
+std::string get_operand(std::string line);
 
 struct Instruction{
     Instruction (std::string line) : line(line), op(get_op(line)), operand(get_operand(line)){
-        
+        OpEntry entry = get_OpEntry(op);
+        // TODO: look to third entry, format. if style 2, then two operands, if style 3, then one, else none
     }
 
     std::string line, op, operand;
