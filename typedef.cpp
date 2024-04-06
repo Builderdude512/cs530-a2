@@ -55,14 +55,14 @@ AddrEntry get_AddrEntry(std::string codename){
 	return {};
 }
 
-void get_Operand1(std::string operand){
-    //
+void get_Format1(std::string op, std::string operand){
+    //Nothing Needed
 }
 
-void get_Operand2(std::string operand, int r1, int r2) {
-
+void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
+ //TODO: figure out r1 and r2 from op and operand
 }
 
-void get_Operand3(std::string operand, int m){
-
+void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+ //TODO: Convert op and operand to bools and disp
 }
