@@ -24,6 +24,15 @@ struct Instruction{
         }
         else {
             AddrEntry entry = get_AddrEntry(op);
+            // TODO: Make a parallel function to above with AddrEntry
+            if(entry.form == 1) {
+                
+            } else if (entry.form == 0) {
+                
+            } else if (entry.form == 3) {
+                
+                // pass 
+            }
         }
 
     }

@@ -50,6 +50,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     string line, line2;
     vector<string> holder;
     string op, operand;
+    // TODO: Keep track of line number to pass to instruction
     while(std::getline(sicfile, line)) {
         Instruction instruct(line);
         std::cout << instruct.op << " " << instruct.operand << std::endl;

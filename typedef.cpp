@@ -35,12 +35,10 @@ OpEntry get_OpEntry(std::string codename){
 
     for(int i = 0; i<(sizeof(arOpTable)/sizeof(arOpTable[0])); i++) {
         if(codename == arOpTable[i].codename){
-			// printf("%d\n", i);
-			// cout << codename << " " << arOpTable[i].codename << "\n";
 			return arOpTable[i];
         }
     }
-	cout << "not found " << codename << "\n";
+	//cout << "not found " << codename << "\n";
 	return {};
 }
 
@@ -51,7 +49,7 @@ AddrEntry get_AddrEntry(std::string codename){
 			return arAddTable[i];
         }
     }
-	cout << "not found " << codename << "\n";
+	//cout << "not found " << codename << "\n";
 	return {};
 }
 
