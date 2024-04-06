@@ -27,9 +27,9 @@ OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"A
 {"SUBR",0x94,0x2},{"SVC",0xB0,0x2},{"TD",0xE0,0x3},{"TIO",0xF8,0x1},
 {"TIX",0x2C,0x3},{"TIXR",0xB8,0x2},{"WD",0xDC,0x3 }};
 
-AddTable arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 }};
+AddrEntry arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 }};
 
-SymTable arSymTable[1000];
+SymEntry arSymTable[1000];
 
 OpEntry get_OpEntry(std::string codename){
 
@@ -40,7 +40,18 @@ OpEntry get_OpEntry(std::string codename){
 			return arOpTable[i];
         }
     }
-	// cout << "not found " << codename << "\n";
+	cout << "not found " << codename << "\n";
+	return {};
+}
+
+AddrEntry get_AddrEntry(std::string codename){
+
+    for(int i = 0; i<(sizeof(arAddTable)/sizeof(arAddTable[0])); i++) {
+        if(codename == arAddTable[i].codename){
+			return arAddTable[i];
+        }
+    }
+	cout << "not found " << codename << "\n";
 	return {};
 }
 

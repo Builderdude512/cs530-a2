@@ -17,19 +17,21 @@ struct OpEntry
 	int form;
 };
 
-struct AddTable
+struct AddrEntry
 {
 	string codename;
 	int form;
 };
 
-struct SymTable
+struct SymEntry
 {
 	string codename;
 	int lock;
 };
 
 OpEntry get_OpEntry(std::string codename);
+
+AddrEntry get_AddrEntry(std::string codename);
 
 void get_Operand1(std::string operand);
 
