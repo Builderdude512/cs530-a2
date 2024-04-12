@@ -16,11 +16,11 @@ using namespace std;
 
 bool first_pass(Symtab & symtab, string flnm);
 bool second_pass(Symtab & symtab, string flnm);
+Symtab symtab;
 
 
 int main() {
 
-    Symtab symtab;
     string flnm = "data/files/P2sample.sic";
 
     bool ok = first_pass(symtab, flnm);
@@ -34,10 +34,48 @@ int main() {
     return 0;
 }
 
-bool first_pass(Symtab & /*symtab*/, string /*flnm*/) 
+bool first_pass(Symtab & /*symtab*/, string flnm) 
 {
     printf("first\n") ;
-    // TODO: read all lines, looking for symbols, put length and value to symbol table, to be done in the future
+    std::cout << flnm << std::endl;
+    fstream sicfile(flnm);
+    // TODO: open file
+    string line, line2;
+    int run_total = 0;
+    vector<string> holder;
+    string op, operand;
+
+    while(std::getline(sicfile, line)) {
+        //TODO: get_label, get_operand, lookup operand in optable to get format size, add to run_total
+        std::string label = get_label(line);
+        std::string op = get_op(line);
+        std::string operand = get_operand(line);
+        OpEntry entry = get_OpEntry(op);
+        if (label.size() > 0) {
+            symtab.values[label] = run_total;
+        }
+        if (entry.codename == op){
+           run_total += entry.form;
+        }
+        else {
+            AddrEntry entry = get_AddrEntry(op);
+            if (entry.codename == "START") {
+                run_total = 0;
+            } else if (entry.codename == "END") {
+                run_total += entry.form;
+            } else if (entry.codename == "BYTE") {
+                run_total += 1;
+            } else if (entry.codename == "WORD") {
+                run_total += 2;
+            } else if (entry.codename == "RESB") {
+                run_total += stoi(operand);
+            } else if (entry.codename == "RESW") {
+                run_total += 2*stoi(operand);
+            } 
+            
+        }
+
+    }
     return true;
 }
 

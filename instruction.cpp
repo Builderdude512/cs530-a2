@@ -25,3 +25,14 @@ std::string get_operand(std::string line)
     iss >> operand;
     return operand;
 }
+
+std::string get_label(std::string line)
+{
+    if(line[0] == ' ') {
+        return "";
+    }
+    std::istringstream iss(line);
+    std::string label;
+    iss >> label;
+    return label;
+}

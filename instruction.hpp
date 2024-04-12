@@ -8,6 +8,8 @@ std::string get_op(std::string line);
 
 std::string get_operand(std::string line);
 
+std::string get_label(std::string line);
+
 struct Instruction{
     Instruction (std::string line) : line(line), op(get_op(line)), operand(get_operand(line)){
         OpEntry entry = get_OpEntry(op);
