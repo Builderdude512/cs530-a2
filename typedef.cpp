@@ -57,10 +57,111 @@ void get_Format1(std::string op, std::string operand){
     //Nothing Needed
 }
 
+//These solutions assume 'op' contains just the opcode and 'operand' contains all other arguments without any whitespace
+//ie "ADDR" and "A,T"
 void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
- //TODO: figure out r1 and r2 from op and operand
-}
+    size_t pos;
+    std::string currRegister;
 
+    //case where only 1 register is given, cannot use ',' as delimiter, r2 is set to 0
+    //TODO: unsure what value r2 needs to be set to in these instructions
+    if(op == "CLEAR" || op == "SVC" || op == "TIXR") {\
+        //with no whitespace, operand should just be the first register ie "A"
+        currRegister = operand;
+
+        //for SVC interrupt, r1 = n, not an actual register
+        if(op == "SVC") {
+            r1 = stoi(currRegister);
+            r2 = 0;
+            return;
+        }
+
+        //set value of r1
+        if(currRegister == "A")
+            r1 = 0;
+        else if(currRegister == "X")
+            r1 = 1;
+        else if(currRegister == "L")
+            r1 = 2;
+        else if(currRegister == "B")
+            r1 = 3;
+        else if(currRegister == "S")
+            r1 = 4;
+        else if(currRegister == "T")
+            r1 = 5;
+        else if(currRegister == "F")
+            r1 = 6;
+        else if(currRegister == "PC")
+            r1 = 8;
+        else if(currRegister == "SW")
+            r1 = 9;
+        else {
+            cout << "bad operand, found " << currRegister;
+            return;
+        }
+        r2 = 0;
+        return;
+    }
+
+    //get first register using ',' as delimiter
+    pos = operand.find(',');
+    currRegister = operand.substr(0, pos);
+    //set r1 based on register found
+    if(currRegister == "A")
+        r1 = 0;
+    else if(currRegister == "X")
+        r1 = 1;
+    else if(currRegister == "L")
+        r1 = 2;
+    else if(currRegister == "B")
+        r1 = 3;
+    else if(currRegister == "S")
+        r1 = 4;
+    else if(currRegister == "T")
+        r1 = 5;
+    else if(currRegister == "F")
+        r1 = 6;
+    else if(currRegister == "PC")
+        r1 = 8;
+    else if(currRegister == "SW")
+        r1 = 9;
+    else {
+        cout << "bad operand, found " << currRegister;
+        return;
+    }
+
+
+    //get second register, from first character after ',' to end
+    currRegister = operand.substr(pos + 1);
+
+    //case where second part of operand is actually a shift amount, pass n-1 to r2 as specified by appendix A
+    if(op == "SHIFTL" || op == "SHIFTR") {
+        r2 = stoi(currRegister);
+        return;
+    }
+
+    //set r2 based on register found
+    if(currRegister == "A")
+        r2 = 0;
+    else if(currRegister == "X")
+        r2 = 1;
+    else if(currRegister == "L")
+        r2 = 2;
+    else if(currRegister == "B")
+        r2 = 3;
+    else if(currRegister == "S")
+        r2 = 4;
+    else if(currRegister == "T")
+        r2 = 5;
+    else if(currRegister == "F")
+        r2 = 6;
+    else if(currRegister == "PC")
+        r2 = 8;
+    else if(currRegister == "SW")
+        r2 = 9;
+    else
+        cout << "bad operand, found " << currRegister;
+}
 void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
  //TODO: Convert op and operand to bools and disp
 }
