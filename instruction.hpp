@@ -12,26 +12,24 @@ struct Instruction{
     Instruction (std::string line) : line(line), op(get_op(line)), operand(get_operand(line)){
         OpEntry entry = get_OpEntry(op);
         if (entry.codename == op){
-            
+            //the get_Format functions take the op and operand and change the class's values
             if(entry.form == 1) {
                 get_Format1(op, operand);
             } else if (entry.form == 2) {
                 get_Format2(op, operand, r1, r2);
             } else if (entry.form == 3) {
-                get_Format3(op, operand, n,i,x,b,p,e,disp);
-                // pass 
+                get_Format3(op, operand, n,i,x,b,p,e,disp); 
             }
         }
         else {
             AddrEntry entry = get_AddrEntry(op);
             // TODO: Make a parallel function to above with AddrEntry
             if(entry.form == 1) {
-                
+                get_AddrFormat1(op, operand /*, and so on- similar to r1 and r2 above*/);
             } else if (entry.form == 0) {
-                
+                get_AddrFormat0(op, operand /*, and so on- similar to r1 and r2 above*/);
             } else if (entry.form == 3) {
-                
-                // pass 
+                get_AddrFormat3(op, operand /*, and so on- similar to r1 and r2 above*/);
             }
         }
 

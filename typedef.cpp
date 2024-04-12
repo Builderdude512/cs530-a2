@@ -33,7 +33,7 @@ SymEntry arSymTable[1000];
 
 OpEntry get_OpEntry(std::string codename){
 
-    for(int i = 0; i<(sizeof(arOpTable)/sizeof(arOpTable[0])); i++) {
+    for(size_t i = 0; i<(sizeof(arOpTable)/sizeof(arOpTable[0])); i++) {
         if(codename == arOpTable[i].codename){
 			return arOpTable[i];
         }
@@ -44,7 +44,7 @@ OpEntry get_OpEntry(std::string codename){
 
 AddrEntry get_AddrEntry(std::string codename){
 
-    for(int i = 0; i<(sizeof(arAddTable)/sizeof(arAddTable[0])); i++) {
+    for(size_t i = 0; i<(sizeof(arAddTable)/sizeof(arAddTable[0])); i++) {
         if(codename == arAddTable[i].codename){
 			return arAddTable[i];
         }
@@ -53,7 +53,7 @@ AddrEntry get_AddrEntry(std::string codename){
 	return {};
 }
 
-void get_Format1(std::string op, std::string operand){
+void get_Format1(std::string /* op */, std::string /* operand */){
     //Nothing Needed
 }
 
@@ -162,6 +162,15 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     else
         cout << "bad operand, found " << currRegister;
 }
-void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+void get_Format3(std::string /* op */, std::string /* operand */, bool &/* n */, bool &/* i */, bool &/* x */, bool &/* b */,bool &/* p */, bool &/* e */, int &/* disp */){
  //TODO: Convert op and operand to bools and disp
+}
+void get_AddrFormat1(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
+
+}
+void get_AddrFormat0(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
+
+}
+void get_AddrFormat3(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
+
 }

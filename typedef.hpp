@@ -39,4 +39,10 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2);
 
 void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp);
 
+void get_AddrFormat1(std::string op, std::string operand /*, and so on- similar to r1 and r2 above*/);
+
+void get_AddrFormat0(std::string op, std::string operand /*, and so on- similar to r1 and r2 above*/);
+
+void get_AddrFormat3(std::string op, std::string operand  /*, and so on- similar to r1 and r2 above*/);
+
 #endif
