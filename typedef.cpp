@@ -46,7 +46,7 @@ OpEntry get_OpEntry(std::string codename, char prefix){
 	return {};
 }
 
-AddrEntry get_AddrEntry(std::string codename){
+AddrEntry get_AddrEntry(std::string codename, char prefix){
 
     for(size_t i = 0; i<(sizeof(arAddTable)/sizeof(arAddTable[0])); i++) {
         if(codename == arAddTable[i].codename){

@@ -6,12 +6,12 @@
 
 std::string get_op(std::string line, char &prefix);
 
-std::string get_operand(std::string line);
+std::string get_operand(std::string line, char &prefix);
 
 std::string get_label(std::string line);
 
 struct Instruction{
-    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line)){
+    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line, prefix)){
         OpEntry entry = get_OpEntry(op, prefix);
         if (entry.codename == op){
             //the get_Format functions take the op and operand and change the class's values
@@ -24,7 +24,7 @@ struct Instruction{
             }
         }
         else {
-            AddrEntry entry = get_AddrEntry(op);
+            AddrEntry entry = get_AddrEntry(op, prefix);
             // TODO: Make a parallel function to above with AddrEntry
             if(entry.form == 1) {
                 get_AddrFormat1(op, operand /*, and so on- similar to r1 and r2 above*/);

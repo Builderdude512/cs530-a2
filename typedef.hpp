@@ -31,7 +31,7 @@ struct SymEntry
 
 OpEntry get_OpEntry(std::string codename, char prefix);
 
-AddrEntry get_AddrEntry(std::string codename);
+AddrEntry get_AddrEntry(std::string codename, char prefix);
 
 void get_Format1(std::string op, std::string operand);
 
