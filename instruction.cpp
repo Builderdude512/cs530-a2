@@ -7,14 +7,16 @@
 #include <map>
 #include <vector>
 
-std::string get_op(std::string line)
+std::string get_op(std::string line, char &prefix)
 {
     std::string line2 = line.substr(10);
     std::istringstream iss(line2);
     std::string op, operand;
     iss >> op;
     if (line[9] == '+') {
-        op = "+" + op;
+        prefix = '+';
+    } else if(line[9] == '+') {
+        prefix = '@';
     }
     return op;
 }

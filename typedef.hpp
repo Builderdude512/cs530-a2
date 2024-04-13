@@ -29,7 +29,7 @@ struct SymEntry
 	int lock;
 };
 
-OpEntry get_OpEntry(std::string codename);
+OpEntry get_OpEntry(std::string codename, char prefix);
 
 AddrEntry get_AddrEntry(std::string codename);
 

@@ -4,15 +4,15 @@
 #include <map>
 #include <string>
 
-std::string get_op(std::string line);
+std::string get_op(std::string line, char &prefix);
 
 std::string get_operand(std::string line);
 
 std::string get_label(std::string line);
 
 struct Instruction{
-    Instruction (std::string line) : line(line), op(get_op(line)), operand(get_operand(line)){
-        OpEntry entry = get_OpEntry(op);
+    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line)){
+        OpEntry entry = get_OpEntry(op, prefix);
         if (entry.codename == op){
             //the get_Format functions take the op and operand and change the class's values
             if(entry.form == 1) {
@@ -49,6 +49,7 @@ struct Instruction{
     bool b = false;
     bool p = false;
     bool e = false;
+    char prefix = 0;
     int disp = 0;
 
     // TODO: add Mnemonics, label, start address, and length, alongside decoding all of the above variables

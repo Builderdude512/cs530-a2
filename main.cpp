@@ -47,10 +47,11 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
 
     while(std::getline(sicfile, line)) {
         //TODO: get_label, get_operand, lookup operand in optable to get format size, add to run_total
+        char prefix = 0;
         std::string label = get_label(line);
-        std::string op = get_op(line);
+        std::string op = get_op(line, prefix);
         std::string operand = get_operand(line);
-        OpEntry entry = get_OpEntry(op);
+        OpEntry entry = get_OpEntry(op, prefix);
         cout << "label = " << label << " " << op << " "<< std::hex << run_total << "\n";
         if (label.size() > 0) {
             symtab.values[label] = run_total;
