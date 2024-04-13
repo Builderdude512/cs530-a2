@@ -13,6 +13,9 @@ std::string get_op(std::string line)
     std::istringstream iss(line2);
     std::string op, operand;
     iss >> op;
+    if (line[9] == '+') {
+        op = "+" + op;
+    }
     return op;
 }
 

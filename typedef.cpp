@@ -32,10 +32,19 @@ AddrEntry arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"
 SymEntry arSymTable[1000];
 
 OpEntry get_OpEntry(std::string codename){
-
+    bool plus = false;
+    if (codename[0] == '+') {
+        plus = true;
+        codename = codename.substr(1);
+    }
     for(size_t i = 0; i<(sizeof(arOpTable)/sizeof(arOpTable[0])); i++) {
         if(codename == arOpTable[i].codename){
-			return arOpTable[i];
+            auto temp = arOpTable[i];
+            if (plus == true) {
+                cout << "plus went through\n";
+                temp.form = 4;
+            }
+			return temp;
         }
     }
 	//cout << "not found " << codename << "\n";

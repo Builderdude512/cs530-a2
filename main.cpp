@@ -51,19 +51,21 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
         std::string op = get_op(line);
         std::string operand = get_operand(line);
         OpEntry entry = get_OpEntry(op);
+        cout << "label = " << label << " " << op << " "<< std::hex << run_total << "\n";
         if (label.size() > 0) {
             symtab.values[label] = run_total;
+            /* cout << "label = " << label << " " << std::hex << run_total << "\n"; */
         }
         if (entry.codename == op){
            run_total += entry.form;
-        }
-        else {
+           cout << "entry" << entry.form << "\n";
+        } else {
             AddrEntry entry = get_AddrEntry(op);
             if (entry.codename == "START") {
                 run_total = 0;
             } else if (entry.codename == "END") {
-                run_total += entry.form;
-            } else if (entry.codename == "BYTE") {
+                
+            } else if (entry.codename == "BYTE" || entry.codename == "BASE") {
                 run_total += 1;
             } else if (entry.codename == "WORD") {
                 run_total += 2;
@@ -99,3 +101,4 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     
     return true;
 }
+
