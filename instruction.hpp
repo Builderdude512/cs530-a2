@@ -6,12 +6,12 @@
 
 std::string get_op(std::string line, char &prefix);
 
-std::string get_operand(std::string line, char &prefix);
+std::string get_operand(std::string line, char &preop);
 
 std::string get_label(std::string line);
 
 struct Instruction{
-    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line, prefix)){
+    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line, preop)){
         OpEntry entry = get_OpEntry(op, prefix);
         if (entry.codename == op){
             //the get_Format functions take the op and operand and change the class's values
@@ -50,6 +50,7 @@ struct Instruction{
     bool p = false;
     bool e = false;
     char prefix = 0;
+    char preop = 0;
     int disp = 0;
 
     // TODO: add Mnemonics, label, start address, and length, alongside decoding all of the above variables

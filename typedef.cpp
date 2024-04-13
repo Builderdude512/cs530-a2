@@ -36,7 +36,6 @@ OpEntry get_OpEntry(std::string codename, char prefix){
         if(codename == arOpTable[i].codename){
             auto temp = arOpTable[i];
             if (prefix == '+') {
-                cout << "plus went through\n";
                 temp.form = 4;
             }
 			return temp;

@@ -9,6 +9,7 @@
 #include <vector>
 #include "instruction.hpp"
 #include "symtab.hpp"
+#include <iterator>
 using namespace std;
 
 // TODO: read SIC files, output ST files and I files
@@ -39,27 +40,24 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     printf("first\n") ;
     std::cout << flnm << std::endl;
     fstream sicfile(flnm);
-    // TODO: open file
     string line, line2;
     int run_total = 0;
     vector<string> holder;
     string op, operand;
 
     while(std::getline(sicfile, line)) {
-        //TODO: get_label, get_operand, lookup operand in optable to get format size, add to run_total
         char prefix = 0;
+        char preop = 0;
         std::string label = get_label(line);
         std::string op = get_op(line, prefix);
-        std::string operand = get_operand(line, prefix);
+        std::string operand = get_operand(line, preop);
         OpEntry entry = get_OpEntry(op, prefix);
-        cout << "label = " << label << " " << op << " "<< std::hex << run_total << "\n";
         if (label.size() > 0) {
             symtab.values[label] = run_total;
             /* cout << "label = " << label << " " << std::hex << run_total << "\n"; */
         }
         if (entry.codename == op){
            run_total += entry.form;
-           cout << "entry" << entry.form << "\n";
         } else {
             AddrEntry entry = get_AddrEntry(op, prefix);
             if (entry.codename == "START") {
@@ -79,6 +77,24 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
         }
 
     }
+
+    printf("%-10s%-10s%-10s%-10s%-10s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
+    printf("--------------------------------------\n");
+
+
+    /* while ()
+    {
+        if(output = addrentry)
+            output AddrEntry
+    } */
+    map<string, int>::iterator it;
+    for (it = symtab.values.begin(); it != symtab.values.end(); it++)
+    {
+        auto label = it->first;
+        auto location = it->second;
+        printf("%-15s%-15s%-15x%-15s%-15s\n", "", label.c_str(), location, "", "");
+    }
+
     return true;
 }
 
