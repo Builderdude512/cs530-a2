@@ -65,17 +65,25 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
         if (label.size() > 0) {
             symtab.values[label] = run_total;
             labelout = label;
-            /* cout << "label = " << label << " " << std::hex << run_total << "\n"; */
+            
         }
+        
+        if (labelout != "") {
+            sprintf(buffer, "%-8s%-8s%06x%-8s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
+            outlines.push_back(buffer);
+        }
+
         if (entry.codename == op){
            run_total += entry.form;
+           /* cout << entry.codename << entry.form;
+           cout << "label = " << label << " " << std::hex << run_total << "\n"; */
         } else {
             AddrEntry entry = get_AddrEntry(op, prefix);
             if (entry.codename == "START") {
                 run_total = 0;
             } else if (entry.codename == "END") {
                 
-            } else if (entry.codename == "BYTE" || entry.codename == "BASE") {
+            } else if (entry.codename == "BYTE") {
                 run_total += 1;
             } else if (entry.codename == "WORD") {
                 run_total += 2;
@@ -87,13 +95,10 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
             
         }
 
-    if (labelout != "") {
-        sprintf(buffer, "%-8s%-8s%06x%-8s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
-        outlines.push_back(buffer);
+    
     }
-    }
-    sprintf(buffer, "%-8s%-8s%-8s%06x%-8s\n", "SUM", "", "", run_total, "");
-    outlines[0] = buffer;
+    /* sprintf(buffer, "%-8s%-8s%-8s%06x%-8s\n", "SUM", "", "", run_total, ""); */
+    /* outlines[0] = buffer; */
     for (auto s:outlines ) {
         cout << s;
     }
@@ -122,7 +127,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
         }
         Instruction instruct(line);
 
-        
+
         std::cout << instruct.op << " " << instruct.operand << std::endl;
     }
 
