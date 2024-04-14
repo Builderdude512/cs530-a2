@@ -1,10 +1,10 @@
 CXX=g++
 
-CXXFLAGS=-Wall -Wextra -std=c++11
+CXXFLAGS=-Wall -Wextra -std=c++11 -I.
 
-TARGET=xed
+TARGET=asxe
 
-SOURCES=main.cpp
+SOURCES=main.cpp instruction.cpp symtab.cpp typedef.cpp
 
 all: $(TARGET)
 
