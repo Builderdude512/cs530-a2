@@ -46,6 +46,7 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     string op, operand;
     char buffer[256];
     std::vector<std::string> outlines;
+    std::vector<std::string> outLit;
     
     printf("%-8s%-8s%-8s%-8s%-8s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
     printf("--------------------------------------\n");
@@ -68,21 +69,26 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
             
         }
         
-        if (labelout != "") {
-            sprintf(buffer, "%-8s%-8s%06x%-8s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
-            outlines.push_back(buffer);
+        if (labelout != "*") {
+            if (labelout != "" && labelout != "*") {
+                sprintf(buffer, "%-8s%-8s%06x%-8s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
+                outlines.push_back(buffer);
+            }
+        } else {
+            std::string holder = prefix + op;
+            sprintf(buffer, "%-8s%-8s%06x%-8i\n", holder.c_str(), "", run_total, entry.form);
+            outLit.push_back(buffer);
         }
-
+        /* out << entry.codename <<  " " << entry.form << " ";
+        cout << "label = " << label << " " << std::hex << run_total << "\n";  */
         if (entry.codename == op){
            run_total += entry.form;
-           /* cout << entry.codename << entry.form;
-           cout << "label = " << label << " " << std::hex << run_total << "\n"; */
         } else {
             AddrEntry entry = get_AddrEntry(op, prefix);
             if (entry.codename == "START") {
                 run_total = 0;
             } else if (entry.codename == "END") {
-                
+                run_total += 3;
             } else if (entry.codename == "BYTE") {
                 run_total += 1;
             } else if (entry.codename == "WORD") {
@@ -90,15 +96,15 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
             } else if (entry.codename == "RESB") {
                 run_total += stoi(operand);
             } else if (entry.codename == "RESW") {
-                run_total += 2*stoi(operand);
+                run_total += 3*stoi(operand);
             } 
             
         }
 
     
     }
-    /* sprintf(buffer, "%-8s%-8s%-8s%06x%-8s\n", "SUM", "", "", run_total, ""); */
-    /* outlines[0] = buffer; */
+    sprintf(buffer, "%-8s%-8s%-8s%06x%-8s\n", "SUM", "", "", run_total, "");
+    outlines[0] = buffer; 
     for (auto s:outlines ) {
         cout << s;
     }
@@ -107,6 +113,9 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     printf("Literal Table\n");
     printf("%-8s%-8s%-8s%-8s\n", "Name", "Operand", "Address", "Length:");
     printf("--------------------------------\n");
+    for (auto s:outLit ) {
+        cout << s;
+    }
 
     return true;
 }
@@ -120,18 +129,53 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     string line, line2;
     vector<string> holder;
     string op, operand;
+    char buffer[256];
+    std::vector<std::string> outl2;
+    int run_total = 0;
     // TODO: Keep track of line number to pass to instruction
     while(std::getline(sicfile, line)) {
         if (line[0] == '.') {
             continue;
         }
+
+        char prefix = 0;
+        char preop = 0;
+        std::string label = get_label(line);
+        std::string op = get_op(line, prefix);
+        std::string operand = get_operand(line, preop);
+        OpEntry entry = get_OpEntry(op, prefix);
+        std::string labelout, csectout = "";
         Instruction instruct(line);
+        if (label.size() > 0) {
+            symtab.values[label] = run_total;
+        }
+        if (entry.codename == op){
+           run_total += entry.form;
+        } else {
+            AddrEntry entry = get_AddrEntry(op, prefix);
+            if (entry.codename == "START") {
+                run_total = 0;
+            } else if (entry.codename == "END") {
+                run_total += 3;
+            } else if (entry.codename == "BYTE") {
+                run_total += 1;
+            } else if (entry.codename == "WORD") {
+                run_total += 2;
+            } else if (entry.codename == "RESB") {
+                run_total += stoi(operand);
+            } else if (entry.codename == "RESW") {
+                run_total += 3*stoi(operand);
+            } 
+            
+        }
 
-
-        std::cout << instruct.op << " " << instruct.operand << std::endl;
+        sprintf(buffer, "%06x%-8s%-8s%-8s%-8s\n", run_total, get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "");
+        outl2.push_back(buffer);
     }
 
-    
+    for (auto s:outl2 ) {
+        cout << s;
+    }
     
     return true;
 }

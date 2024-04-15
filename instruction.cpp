@@ -13,9 +13,9 @@ std::string get_op(std::string line, char &prefix)
     std::istringstream iss(line2);
     std::string op, operand;
     iss >> op;
-    if (line[9] == '+') {
-        prefix = '+';
-    } else if(line[9] == '+') {
+    if (line[9] == '+' || line[9] == '=') {
+        prefix = line[9];
+    } else if(line[9] != '+') {
         prefix = '@';
     }
     return op;
