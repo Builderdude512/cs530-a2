@@ -11,6 +11,7 @@
 #include "symtab.hpp"
 using namespace std;
 
+extern Symtab symtab;
 
 OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"AND",0x40,0x3},
 {"CLEAR",0xB4,0x2},{"COMP",0x28,0x3},{"COMPF",0x88,0x3},{"COMPR",0xA0,0x2},
@@ -167,7 +168,7 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 }
 
 //again assumes no whitespace
-void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp, Symtab symtab){
+void get_Format3(std::string op, char prefix, std::string operand, char preop, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
     std::string currOperand;
     std::queue<string> operandArr;
     std::queue<char> operatorArr;
@@ -177,6 +178,7 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
     //set n & i to true, change if not simple addressing
     n = true;
     i = true;
+
 
     //RSUB instruction has no operand, sets everything else to 0. Should be the only instruction like this, but unsure
     if(op == "RSUB") {
@@ -189,30 +191,33 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
     }
 
     //check for n
-    if(operand.at(0) == '@') {
+    if(preop == '@') {
         i = false;
         currOperand = operand.substr(1);
     }
 
     //check for i
-    if(operand.at(0) == '#') {
+    if(preop == '#') {
         n = false;
         currOperand = operand.substr(1);
     }
 
     //check for x
-    if(operand.substr(operand.length()-2) == ",x") {
+    if(operand.length() > 2 && operand.substr(operand.length()-2) == ",x") {
         x = true;
         currOperand = operand.substr(0, operand.length()-2);
     }
-    else
+    else {
         x = false;
-
+    }
     //check for e
-    if(op.at(0) == '+')
-        e = true;
-    else
+    if(prefix == '+') {
+        e=true;
+    }
+    else {
         e = false;
+    }
+
 
 
     //control structure for b/p flags, don't enter if immediate/direct addressing mode is selected
@@ -229,9 +234,8 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
         }
          */
     }
-
     //check if the first term is negative
-    if(currOperand.at(0) == '-') {
+    if(currOperand.length() > 0 && currOperand.at(0) == '-') {
         leadingNegativeTerm = true;
         currOperand = currOperand.substr(1);
     }
@@ -254,6 +258,7 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
         currOperand = currOperand.substr(j+1);
 
     }
+    return;
 
     //find raw value of operand
     //add/subtract leading term
@@ -264,7 +269,6 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
         m -= findValue(operandArr.front(), symtab);
     }
     operandArr.pop();
-
     //iterate over remaining operand elements
     while(!operandArr.empty()) {
         if(operatorArr.front() == '+') {
@@ -272,7 +276,9 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
         } else if (operatorArr.front() == '-') {
             m -= findValue(operandArr.front(), symtab);
         }
-        operandArr.pop();
+        if (!operandArr.empty()) {
+            operandArr.pop();
+        }
         operatorArr.pop();
     }
 
