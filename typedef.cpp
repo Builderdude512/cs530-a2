@@ -280,9 +280,9 @@ void get_Format3(std::string op, std::string operand, bool &n, bool &i, bool &x,
     //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
     //TODO: find a way to pass current BASE/PC register values
     if(b) {
-        //disp = m + BASE REGISTER VALUE
+        //disp = m - BASE REGISTER VALUE
     } else  if (p) {
-        //disp = m + PC REGISTER VALUE
+        //disp = m - PC REGISTER VALUE
     }
     else {
         disp = m;
