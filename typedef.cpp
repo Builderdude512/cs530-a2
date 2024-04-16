@@ -100,7 +100,6 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
         else if(currRegister == "SW")
             r1 = 9;
         else {
-            cout << "bad operand, found " << currRegister;
             return;
         }
         r2 = 0;
@@ -130,7 +129,6 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     else if(currRegister == "SW")
         r1 = 9;
     else {
-        cout << "bad operand, found " << currRegister;
         return;
     }
 

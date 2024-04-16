@@ -39,8 +39,6 @@ int main() {
 
 bool first_pass(Symtab & /*symtab*/, string flnm) 
 {
-    printf("first\n") ;
-    std::cout << flnm << std::endl;
     fstream sicfile(flnm);
     string line, line2;
     int run_total = 0;
@@ -138,7 +136,6 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
 bool second_pass(Symtab & /*symtab*/, string flnm) 
 {
     printf("second\n") ;
-    std::cout << flnm << std::endl;
     fstream sicfile(flnm);
     // TODO: open file
     string line, line2;
@@ -147,6 +144,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
     char buffer[256];
     std::vector<std::string> outl2;
     int run_total = 0;
+    
     // TODO: Keep track of line number to pass to instruction
     while(std::getline(sicfile, line)) {
         if (line[0] == '.') {
@@ -159,7 +157,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
         std::string op = get_op(line, prefix);
         std::string operand = get_operand(line, preop);
         OpEntry entry = get_OpEntry(op, prefix);
-        std::string labelout, csectout = "";
+        std::string labelout, operout = "";
         Instruction instruct(line);
         if (label.size() > 0) {
             symtab.values[label] = run_total;
@@ -184,7 +182,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
             
         }
 
-        sprintf(buffer, "%06x%-8s%-8s%-8s%-8s\n", run_total, get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "");
+        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%-8s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "");
         outl2.push_back(buffer);
     }
 
