@@ -5,11 +5,13 @@
 #include <iomanip>
 #include <map>
 #include <vector>
+#include <queue>
 #include "typedef.hpp"
 #include "instruction.hpp"
 #include "symtab.hpp"
 using namespace std;
 
+extern Symtab symtab;
 
 OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"AND",0x40,0x3},
 {"CLEAR",0xB4,0x2},{"COMP",0x28,0x3},{"COMPF",0x88,0x3},{"COMPR",0xA0,0x2},
@@ -67,7 +69,6 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     std::string currRegister;
 
     //case where only 1 register is given, cannot use ',' as delimiter, r2 is set to 0
-    //TODO: unsure what value r2 needs to be set to in these instructions
     if(op == "CLEAR" || op == "SVC" || op == "TIXR") {\
         //with no whitespace, operand should just be the first register ie "A"
         currRegister = operand;
@@ -99,7 +100,6 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
         else if(currRegister == "SW")
             r1 = 9;
         else {
-            cout << "bad operand, found " << currRegister;
             return;
         }
         r2 = 0;
@@ -129,7 +129,6 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     else if(currRegister == "SW")
         r1 = 9;
     else {
-        cout << "bad operand, found " << currRegister;
         return;
     }
 
@@ -165,8 +164,147 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     else
         cout << "bad operand, found " << currRegister;
 }
-void get_Format3(std::string /* op */, std::string /* operand */, bool &/* n */, bool &/* i */, bool &/* x */, bool &/* b */,bool &/* p */, bool &/* e */, int &/* disp */){
- //TODO: Convert op and operand to bools and disp
+
+//again assumes no whitespace
+void get_Format3(std::string op, char prefix, std::string operand, char preop, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+    std::string currOperand;
+    std::queue<string> operandArr;
+    std::queue<char> operatorArr;
+    bool leadingNegativeTerm = false;
+    int m = 0;
+
+    //set n & i to true, change if not simple addressing
+    n = true;
+    i = true;
+
+
+    //RSUB instruction has no operand, sets everything else to 0. Should be the only instruction like this, but unsure
+    if(op == "RSUB") {
+        x = false;
+        b = false;
+        p = false;
+        e = false;
+        disp = 0;
+        return;
+    }
+
+    //check for n
+    if(preop == '@') {
+        i = false;
+        currOperand = operand.substr(1);
+    }
+
+    //check for i
+    if(preop == '#') {
+        n = false;
+        currOperand = operand.substr(1);
+    }
+
+    //check for x
+    if(operand.length() > 2 && operand.substr(operand.length()-2) == ",x") {
+        x = true;
+        currOperand = operand.substr(0, operand.length()-2);
+    }
+    else {
+        x = false;
+    }
+    //check for e
+    if(prefix == '+') {
+        e=true;
+    }
+    else {
+        e = false;
+    }
+
+
+
+    //control structure for b/p flags, don't enter if immediate/direct addressing mode is selected
+    if(!n && !e) {
+        //TODO: implement BASE assembler directive
+        /*
+        if(BASE is set) {
+            b = true;
+            p = false;
+        }
+        else {
+            b = false;
+            p = true;
+        }
+         */
+    }
+    //check if the first term is negative
+    if(currOperand.length() > 0 && currOperand.at(0) == '-') {
+        leadingNegativeTerm = true;
+        currOperand = currOperand.substr(1);
+    }
+    //tokenize operand for cases where multiple values are added/subtracted from each other
+    while(currOperand.length() > 0) {
+        int j;
+        //loop over operand until '+' or '-' is found
+        for(j = 0; j < currOperand.length(); j++) {
+            //if operator found, add it to operator array, add preceding term to operand array
+            if(currOperand.at(i) == '+' || currOperand.at(i) == '-') {
+                operatorArr.push(currOperand.at(i));
+                operandArr.push(currOperand.substr(0,i));
+            }
+        }
+        //if no operator found, add remaining operand as the last term in operand array
+        if(j == currOperand.length()) {
+            operandArr.push(currOperand);
+        }
+        //remove added portion from currOperand
+        currOperand = currOperand.substr(j+1);
+
+    }
+    return;
+
+    //find raw value of operand
+    //add/subtract leading term
+    if(!leadingNegativeTerm) {
+        m += findValue(operandArr.front(), symtab);
+    }
+    else {
+        m -= findValue(operandArr.front(), symtab);
+    }
+    operandArr.pop();
+    //iterate over remaining operand elements
+    while(!operandArr.empty()) {
+        if(operatorArr.front() == '+') {
+            m += findValue(operandArr.front(), symtab);
+        } else if (operatorArr.front() == '-') {
+            m -= findValue(operandArr.front(), symtab);
+        }
+        if (!operandArr.empty()) {
+            operandArr.pop();
+        }
+        operatorArr.pop();
+    }
+
+    //use raw value and flags to find disp
+    //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
+    //TODO: find a way to pass current BASE/PC register values
+    if(b) {
+        //disp = m - BASE REGISTER VALUE
+    } else  if (p) {
+        //disp = m - PC REGISTER VALUE
+    }
+    else {
+        disp = m;
+    }
+}
+//helper method to process operand tokens
+int findValue(std::string token, Symtab symtab) {
+    //try to return value if it is an int literal, catch and find value in SYMTAB if not int literal
+    try {
+        return stoi(token);
+    }
+    catch (std::exception& e) {
+        //checks to see if entry exists in symtab (which it should) before grabbing value
+        if(symtab.values.find(token) != symtab.values.end()) {
+            return symtab.values[token];
+        }
+        return 0;
+    }
 }
 void get_AddrFormat1(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
 

@@ -20,7 +20,8 @@ struct Instruction{
             } else if (entry.form == 2) {
                 get_Format2(op, operand, r1, r2);
             } else if (entry.form == 3) {
-                get_Format3(op, operand, n,i,x,b,p,e,disp); 
+                cout << line << "\n";
+                get_Format3(op, prefix, operand, preop, n,i,x,b,p,e,disp); 
             }
         }
         else {
