@@ -48,8 +48,14 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     std::vector<std::string> outlines;
     std::vector<std::string> outLit;
     
-    printf("%-8s%-8s%-8s%-8s%-8s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
-    printf("--------------------------------------\n");
+    FILE *fptr = fopen("p2sample.l", "w"); 
+    if (fptr == NULL) 
+    { 
+        printf("Could not open %s\n", "p2sample.l"); 
+        return 0; 
+    }
+    fprintf(fptr, "%-8s%-8s%-8s%-8s%-8s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
+    fprintf(fptr, "--------------------------------------\n");
 
     while(std::getline(sicfile, line)) {
         if (line[0] == '.') {
@@ -106,15 +112,15 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     sprintf(buffer, "%-8s%-8s%-8s%06x%-8s\n", "SUM", "", "", run_total, "");
     outlines[0] = buffer; 
     for (auto s:outlines ) {
-        cout << s;
+        fprintf(fptr, "%s", s.c_str());
     }
 
-    printf("\n");
-    printf("Literal Table\n");
-    printf("%-8s%-8s%-8s%-8s\n", "Name", "Operand", "Address", "Length:");
-    printf("--------------------------------\n");
+    fprintf(fptr, "\n");
+    fprintf(fptr, "Literal Table\n");
+    fprintf(fptr, "%-8s%-8s%-8s%-8s\n", "Name", "Operand", "Address", "Length:");
+    fprintf(fptr, "--------------------------------\n");
     for (auto s:outLit ) {
-        cout << s;
+        fprintf(fptr, "%s", s.c_str());
     }
 
     return true;
