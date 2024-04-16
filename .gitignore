@@ -2,6 +2,8 @@
 .vscode/
 asxe
 p2sample.l
+data/files/P2sample.l
+
 
 # Prerequisites
 *.d

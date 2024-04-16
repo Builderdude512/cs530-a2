@@ -4,7 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <filesystem>
 #include <iomanip>
+#include <utility>
 #include <map>
 #include <vector>
 #include "instruction.hpp"
@@ -48,10 +50,17 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     std::vector<std::string> outlines;
     std::vector<std::string> outLit;
     
-    FILE *fptr = fopen("p2sample.l", "w"); 
+    //TODO build a p2sample.l filename from flnm
+    /* std::filesystem::path listing_file{sicfile}, ext{"sic"};
+    listing_file.replace_extension(ext); */
+    auto pos = flnm.find('.');
+    string listing_file = flnm;
+    listing_file = listing_file.substr(0, pos);
+    listing_file += ".l";
+    FILE *fptr = fopen(listing_file.c_str(), "w"); 
     if (fptr == NULL) 
     { 
-        printf("Could not open %s\n", "p2sample.l"); 
+        printf("Could not open %s\n", listing_file.c_str()); 
         return 0; 
     }
     fprintf(fptr, "%-8s%-8s%-8s%-8s%-8s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
