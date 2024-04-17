@@ -1,3 +1,7 @@
+// Source code for assignment 2
+// Connor Shands-Sparks - REDID:
+// Connor Symons - REDID:828475798
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -12,6 +16,8 @@
 using namespace std;
 
 extern Symtab symtab;
+extern bool baseSet;
+extern int baseAddr;
 
 OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"AND",0x40,0x3},
 {"CLEAR",0xB4,0x2},{"COMP",0x28,0x3},{"COMPF",0x88,0x3},{"COMPR",0xA0,0x2},
@@ -29,7 +35,8 @@ OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"A
 {"SUBR",0x94,0x2},{"SVC",0xB0,0x2},{"TD",0xE0,0x3},{"TIO",0xF8,0x1},
 {"TIX",0x2C,0x3},{"TIXR",0xB8,0x2},{"WD",0xDC,0x3 }};
 
-AddrEntry arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 }};
+AddrEntry arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 },
+                          {"BASE",0x0},{"ORG",0x0},{"EQU",0x0},{"NOBASE",0x0},{"*",0x0}};
 
 SymEntry arSymTable[1000];
 
@@ -63,7 +70,6 @@ void get_Format1(std::string /* op */, std::string /* operand */){
 }
 
 //These solutions assume 'op' contains just the opcode and 'operand' contains all other arguments without any whitespace
-//ie "ADDR" and "A,T"
 void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
     size_t pos;
     std::string currRegister;
@@ -166,11 +172,11 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 }
 
 //again assumes no whitespace
-void get_Format3(std::string op, char prefix, std::string operand, char preop, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
-    std::string currOperand;
+//added linenum argument for PC-relative addressing
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+    std::string currOperand = operand;
     std::queue<string> operandArr;
     std::queue<char> operatorArr;
-    bool leadingNegativeTerm = false;
     int m = 0;
 
     //set n & i to true, change if not simple addressing
@@ -178,7 +184,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, b
     i = true;
 
 
-    //RSUB instruction has no operand, sets everything else to 0. Should be the only instruction like this, but unsure
+    //RSUB instruction has no operand, sets everything else to 0.
     if(op == "RSUB") {
         x = false;
         b = false;
@@ -191,38 +197,32 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, b
     //check for n
     if(preop == '@') {
         i = false;
-        currOperand = operand.substr(1);
     }
 
     //check for i
     if(preop == '#') {
         n = false;
-        currOperand = operand.substr(1);
     }
 
     //check for x
     if(operand.length() > 2 && operand.substr(operand.length()-2) == ",x") {
         x = true;
-        currOperand = operand.substr(0, operand.length()-2);
+        currOperand = currOperand.substr(0, operand.length()-2);
     }
     else {
         x = false;
     }
     //check for e
     if(prefix == '+') {
-        e=true;
+        e = true;
     }
     else {
         e = false;
     }
 
-
-
     //control structure for b/p flags, don't enter if immediate/direct addressing mode is selected
-    if(!n && !e) {
-        //TODO: implement BASE assembler directive
-        /*
-        if(BASE is set) {
+    if(n && !e) {
+        if(baseSet) {
             b = true;
             p = false;
         }
@@ -230,82 +230,24 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, b
             b = false;
             p = true;
         }
-         */
     }
-    //check if the first term is negative
-    if(currOperand.length() > 0 && currOperand.at(0) == '-') {
-        leadingNegativeTerm = true;
-        currOperand = currOperand.substr(1);
-    }
-    //tokenize operand for cases where multiple values are added/subtracted from each other
-    while(currOperand.length() > 0) {
-        int j;
-        //loop over operand until '+' or '-' is found
-        for(j = 0; j < currOperand.length(); j++) {
-            //if operator found, add it to operator array, add preceding term to operand array
-            if(currOperand.at(i) == '+' || currOperand.at(i) == '-') {
-                operatorArr.push(currOperand.at(i));
-                operandArr.push(currOperand.substr(0,i));
-            }
-        }
-        //if no operator found, add remaining operand as the last term in operand array
-        if(j == currOperand.length()) {
-            operandArr.push(currOperand);
-        }
-        //remove added portion from currOperand
-        currOperand = currOperand.substr(j+1);
 
-    }
-    return;
-
-    //find raw value of operand
-    //add/subtract leading term
-    if(!leadingNegativeTerm) {
-        m += findValue(operandArr.front(), symtab);
-    }
-    else {
-        m -= findValue(operandArr.front(), symtab);
-    }
-    operandArr.pop();
-    //iterate over remaining operand elements
-    while(!operandArr.empty()) {
-        if(operatorArr.front() == '+') {
-            m += findValue(operandArr.front(), symtab);
-        } else if (operatorArr.front() == '-') {
-            m -= findValue(operandArr.front(), symtab);
-        }
-        if (!operandArr.empty()) {
-            operandArr.pop();
-        }
-        operatorArr.pop();
-    }
+    //get raw operand value
+    m = findValue(currOperand, symtab);
 
     //use raw value and flags to find disp
     //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
-    //TODO: find a way to pass current BASE/PC register values
     if(b) {
-        //disp = m - BASE REGISTER VALUE
+        disp = m - baseAddr;
     } else  if (p) {
-        //disp = m - PC REGISTER VALUE
+        //subtract PC value from raw value, which will be 3 more than the current line number
+        disp = m - (linenum + 3);
     }
     else {
         disp = m;
     }
 }
-//helper method to process operand tokens
-int findValue(std::string token, Symtab symtab) {
-    //try to return value if it is an int literal, catch and find value in SYMTAB if not int literal
-    try {
-        return stoi(token);
-    }
-    catch (std::exception& e) {
-        //checks to see if entry exists in symtab (which it should) before grabbing value
-        if(symtab.values.find(token) != symtab.values.end()) {
-            return symtab.values[token];
-        }
-        return 0;
-    }
-}
+
 void get_AddrFormat1(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
 
 }
@@ -314,4 +256,88 @@ void get_AddrFormat0(std::string /* op */, std::string /* operand */ /*, and so 
 }
 void get_AddrFormat3(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
 
+}
+
+//helper method to process operand value
+int findValue(std::string currOperand, Symtab symtab) {
+    int m = 0;
+    int currValue;
+    std::queue<string> operandArr;
+    std::queue<char> operatorArr;
+    bool leadingNegativeTerm = false;
+    //check if the first term is negative
+    if(currOperand.length() > 0 && currOperand.at(0) == '-') {
+        leadingNegativeTerm = true;
+        currOperand = currOperand.substr(1);
+    }
+
+
+    //tokenize operand for cases where multiple values are added/subtracted from each other
+    while(currOperand.length() > 0) {
+        unsigned long long j;
+        //loop over operand until '+' or '-' is found
+        for(j = 0; j < currOperand.length(); j++) {
+            //if operator found, add it to operator array, add preceding term to operand array
+            if(currOperand.at(j) == '+' || currOperand.at(j) == '-') {
+                operatorArr.push(currOperand.at(j));
+                operandArr.push(currOperand.substr(0,j));
+                break;
+            }
+        }
+        //if no operator found, add remaining operand as the last term in operand array
+        if(j == currOperand.length()) {
+            operandArr.push(currOperand);
+            j--;
+        }
+        //remove added portion from currOperand
+        currOperand = currOperand.substr(j+1);
+    }
+
+
+    //find raw value of operand
+    //try to return value if it is an int literal, catch and find value in SYMTAB if not int literal
+    try {
+        currValue = stoi(operandArr.front());
+    }
+    catch (std::exception& e) {
+        //checks to see if entry exists in symtab (which it should) before grabbing value
+        if(symtab.values.find(operandArr.front()) != symtab.values.end()) {
+            currValue = symtab.values[operandArr.front()];
+        }
+        else
+            currValue = 0;
+    }
+    //add/subtract leading term
+    if(!leadingNegativeTerm) {
+        m += currValue;
+    }
+    else {
+
+        m -= currValue;
+    }
+    operandArr.pop();
+
+
+    //iterate over remaining operand elements
+    while(!operandArr.empty()) {
+        try {
+            currValue = stoi(operandArr.front());
+        }
+        catch (std::exception& e) {
+            //checks to see if entry exists in symtab (which it should) before grabbing value
+            if(symtab.values.find(operandArr.front()) != symtab.values.end()) {
+                currValue = symtab.values[operandArr.front()];
+            }
+            else
+                currValue = 0;
+        }
+        if(operatorArr.front() == '+') {
+            m += currValue;
+        } else if (operatorArr.front() == '-') {
+            m -= currValue;
+        }
+        operandArr.pop();
+        operatorArr.pop();
+    }
+    return m;
 }
