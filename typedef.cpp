@@ -173,7 +173,7 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 
 //again assumes no whitespace
 //added linenum argument for PC-relative addressing
-void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp) {
     std::string currOperand = operand;
     std::queue<string> operandArr;
     std::queue<char> operatorArr;
@@ -234,7 +234,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
 
     //get raw operand value
     m = findValue(currOperand, symtab);
-
+    
     //use raw value and flags to find disp
     //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
     if(b) {
@@ -246,16 +246,6 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     else {
         disp = m;
     }
-}
-
-void get_AddrFormat1(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
-}
-void get_AddrFormat0(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
-}
-void get_AddrFormat3(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
 }
 
 //helper method to process operand value

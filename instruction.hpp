@@ -25,19 +25,12 @@ struct Instruction{
                 get_Format2(op, operand, r1, r2);
             } else if (entry.form == 3) {
                 cout << line << "\n";
-                get_Format3(op, prefix, operand, preop, n,i,x,b,p,e,disp); 
+                get_Format3(op, prefix, operand, preop, linenum, n,i,x,b,p,e,disp); 
             }
         }
         else {
             AddrEntry entry = get_AddrEntry(op, prefix);
             // TODO: Make a parallel function to above with AddrEntry
-            if(entry.form == 1) {
-                get_AddrFormat1(op, operand /*, and so on- similar to r1 and r2 above*/);
-            } else if (entry.form == 0) {
-                get_AddrFormat0(op, operand /*, and so on- similar to r1 and r2 above*/);
-            } else if (entry.form == 3) {
-                get_AddrFormat3(op, operand /*, and so on- similar to r1 and r2 above*/);
-            }
         }
 
     }

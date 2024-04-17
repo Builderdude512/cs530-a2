@@ -185,8 +185,19 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
             
         }
 
-        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%-8s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "");
+        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%-8i\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), baseAddr);
         outl2.push_back(buffer);
+    }
+
+    auto pos = flnm.find('.');
+    string listing_file = flnm;
+    listing_file = listing_file.substr(0, pos);
+    listing_file += ".l";
+    FILE *fptr = fopen(listing_file.c_str(), "w"); 
+    if (fptr == NULL) 
+    { 
+        printf("Could not open %s\n", listing_file.c_str()); 
+        return 0; 
     }
 
     for (auto s:outl2 ) {
