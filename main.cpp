@@ -1,4 +1,6 @@
-// Your First C++ Program
+// Source code for assignment 2
+// Connor Shands-Sparks - REDID:
+// Connor Symons - REDID:828475798
 
 #include <iostream>
 #include <fstream>
@@ -20,7 +22,8 @@ using namespace std;
 bool first_pass(Symtab & symtab, string flnm);
 bool second_pass(Symtab & symtab, string flnm);
 Symtab symtab;
-
+bool baseSet;
+int baseAddr;
 
 int main() {
 
