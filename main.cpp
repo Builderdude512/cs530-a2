@@ -185,7 +185,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
             
         }
 
-        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%04s%-8i\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "", symtab.values);
+        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%04s%s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "", instruct.get_instform().c_str());
         outl2.push_back(buffer);
     }
 
