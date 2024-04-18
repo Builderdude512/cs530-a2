@@ -173,6 +173,7 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 
 //again assumes no whitespace
 //added linenum argument for PC-relative addressing
+//TODO: I changed disp to unsigned to make it run, but that MIGHT not be right
 void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, unsigned int &disp) {
     std::string currOperand = operand;
     std::queue<string> operandArr;
@@ -195,6 +196,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     }
 
     //check for n
+    //TODO: are N and I backwards?
     if(preop == '@') {
         i = false;
     }
@@ -241,6 +243,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
         disp = m - baseAddr;
     } else  if (p) {
         //subtract PC value from raw value, which will be 3 more than the current line number
+        //TODO: this three looks incredibly suspicious, the address outputs are off by 3
         disp = m - (linenum + 3);
     }
     else {

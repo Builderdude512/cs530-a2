@@ -15,22 +15,23 @@ std::string get_operand(std::string line, char &preop);
 std::string get_label(std::string line);
 
 struct Instruction{
-    Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line, preop)){
+    Instruction (std::string line) : line(line){
+        op = get_op(line, prefix);
+        operand = get_operand(line, preop);
         OpEntry entry = get_OpEntry(op, prefix);
         if (entry.codename == op){
             formatType = entry.form;
-            cout << formatType << " " << op << " |" << prefix << "| " << preop << " \n";
-            //the get_Format functions take the op and operand and change the class's values
+            
             if(entry.form == 1) {
                 get_Format1(op, operand);
             } else if (entry.form == 2) {
                 get_Format2(op, operand, r1, r2);
-            } else if (entry.form == 3) {
+            } else if (entry.form == 3 || entry.form == 4) {
                 get_Format3(op, prefix, operand, preop, linenum, n,i,x,b,p,e,disp);
             }
         }
         else {
-            AddrEntry entry = get_AddrEntry(op, prefix);
+            AddrEntry addrEntry = get_AddrEntry(op, prefix);
             // TODO: Make a parallel function to above with AddrEntry
         }
 

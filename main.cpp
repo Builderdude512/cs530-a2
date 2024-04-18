@@ -138,7 +138,6 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
 
 bool second_pass(Symtab & /*symtab*/, string flnm) 
 {
-    printf("second\n") ;
     fstream sicfile(flnm);
     // TODO: open file
     string line, line2;
@@ -162,7 +161,6 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
         OpEntry entry = get_OpEntry(op, prefix);
         std::string labelout, operout = "";
         Instruction instruct(line);
-        cout << preop << " \n";
         if (label.size() > 0) {
             symtab.values[label] = run_total;
         }
