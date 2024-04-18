@@ -10,6 +10,7 @@
 struct Symtab{
     std::map<std::string, int> values;
     std::map<std::string, int> lengths;
+    std::map<std::string, std::string> flags;
 };
 
 

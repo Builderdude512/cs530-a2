@@ -19,7 +19,8 @@ extern Symtab symtab;
 extern bool baseSet;
 extern int baseAddr;
 
-OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"AND",0x40,0x3},
+
+OpEntry arOpTable[] = {{"",0x0,0x0},{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"AND",0x40,0x3},
 {"CLEAR",0xB4,0x2},{"COMP",0x28,0x3},{"COMPF",0x88,0x3},{"COMPR",0xA0,0x2},
 {"DIV",0x24,0x3},{"DIVF",0x64,0x3},{"DIVR",0x9C,0x2},{"FIX",0xC4,0x1},
 {"FLOAT",0xC0,0x1},{"HIO",0xF4,0x1},{"J",0x3C,0x3},{"JEQ",0x30,0x3},
@@ -35,7 +36,7 @@ OpEntry arOpTable[] = {{ "ADD",0x18,0x3},{"ADDF",0x58,0x3},{"ADDR",0x90,0x2},{"A
 {"SUBR",0x94,0x2},{"SVC",0xB0,0x2},{"TD",0xE0,0x3},{"TIO",0xF8,0x1},
 {"TIX",0x2C,0x3},{"TIXR",0xB8,0x2},{"WD",0xDC,0x3 }};
 
-AddrEntry arAddTable[] = {{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 },
+AddrEntry arAddTable[] = {{"",0x0},{"START",0x0},{"END",0x0},{"BYTE",0x1},{"WORD",0x3},{"RESB",0x1},{"RESW",0x3 },
                           {"BASE",0x0},{"ORG",0x0},{"EQU",0x0},{"NOBASE",0x0},{"*",0x0}};
 
 SymEntry arSymTable[1000];
@@ -50,19 +51,16 @@ OpEntry get_OpEntry(std::string codename, char prefix){
 			return temp;
         }
     }
-	//cout << "not found " << codename << "\n";
-	return {};
+	return arOpTable[0];
 }
 
-AddrEntry get_AddrEntry(std::string codename, char prefix){
-
+AddrEntry get_AddrEntry(std::string codename){
     for(size_t i = 0; i<(sizeof(arAddTable)/sizeof(arAddTable[0])); i++) {
         if(codename == arAddTable[i].codename){
 			return arAddTable[i];
         }
     }
-	//cout << "not found " << codename << "\n";
-	return {};
+	return arAddTable[0];
 }
 
 void get_Format1(std::string /* op */, std::string /* operand */){
@@ -173,8 +171,7 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 
 //again assumes no whitespace
 //added linenum argument for PC-relative addressing
-//TODO: I changed disp to unsigned to make it run, but that MIGHT not be right
-void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, unsigned int &disp) {
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp) {
     std::string currOperand = operand;
     std::queue<string> operandArr;
     std::queue<char> operatorArr;
@@ -196,7 +193,6 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     }
 
     //check for n
-    //TODO: are N and I backwards?
     if(preop == '@') {
         i = false;
     }
@@ -207,7 +203,8 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     }
 
     //check for x
-    if(operand.length() > 2 && operand.substr(operand.length()-2) == ",x") {
+    if(currOperand.length() > 2 && currOperand.substr(operand.length()-2) == ",X") {
+
         x = true;
         currOperand = currOperand.substr(0, operand.length()-2);
     }
@@ -221,6 +218,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     else {
         e = false;
     }
+
 
     //control structure for b/p flags, don't enter if immediate/direct addressing mode is selected
     if(n && !e) {
@@ -236,14 +234,25 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
 
     //get raw operand value
     m = findValue(currOperand, symtab);
-    
+
+
+
+
     //use raw value and flags to find disp
     //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
     if(b) {
-        disp = m - baseAddr;
+        //use base relative if disp would be >= 0, otherwise use pc-relative
+        if(m - baseAddr >= 0) {
+            disp = m - baseAddr;
+        }
+        else {
+            p = true;
+            b = false;
+            //subtract PC value from raw value, which will be 3 more than the current line number
+            disp = m - (linenum + 3);
+        }
     } else  if (p) {
         //subtract PC value from raw value, which will be 3 more than the current line number
-        //TODO: this three looks incredibly suspicious, the address outputs are off by 3
         disp = m - (linenum + 3);
     }
     else {
@@ -263,6 +272,8 @@ int findValue(std::string currOperand, Symtab symtab) {
         leadingNegativeTerm = true;
         currOperand = currOperand.substr(1);
     }
+    if(currOperand == "=C\'EOF\'")
+        cout << symtab.values["*"] << endl;
 
 
     //tokenize operand for cases where multiple values are added/subtracted from each other
@@ -333,4 +344,29 @@ int findValue(std::string currOperand, Symtab symtab) {
         operatorArr.pop();
     }
     return m;
+}
+
+void findLitValue(std::string operand, std::string &literal, unsigned long &value, unsigned long &length) {
+    //extract literal from operand and find value
+    literal = operand.substr(2);
+    literal = literal.substr(0, literal.length() - 1);
+    //if hex, pass value, if char, parse value
+    if(operand.at(0) == 'X') {
+        //remove leading zeros
+        while(literal.at(0) == '0') {
+            literal = literal.substr(1);
+        }
+        //normalize value with size of byte
+        if(literal.length() % 2 == 1)
+            literal = "0" + literal;
+        value = strtoul(literal.c_str(), NULL, 16);
+        length = literal.length()/2;
+    }
+    else if(operand.at(0) == 'C') {
+        for(char j : literal) {
+            value = value << 8;
+            value |= j;
+        }
+        length = literal.length();
+    }
 }

@@ -14,8 +14,11 @@ std::string get_operand(std::string line, char &preop);
 
 std::string get_label(std::string line);
 
+std::string replaceUppercase(std::string instruction);
+
 struct Instruction{
-    Instruction (std::string line) : line(line){
+    Instruction (int run_total, std::string line) : line(line){
+        linenum = run_total;
         op = get_op(line, prefix);
         operand = get_operand(line, preop);
         OpEntry entry = get_OpEntry(op, prefix);
@@ -29,10 +32,6 @@ struct Instruction{
             } else if (entry.form == 3 || entry.form == 4) {
                 get_Format3(op, prefix, operand, preop, linenum, n,i,x,b,p,e,disp);
             }
-        }
-        else {
-            AddrEntry addrEntry = get_AddrEntry(op, prefix);
-            // TODO: Make a parallel function to above with AddrEntry
         }
 
     }
@@ -51,10 +50,8 @@ struct Instruction{
     bool e = false;
     char prefix = 0;
     char preop = 0;
-    unsigned int disp = 0;
+    int disp = 0;
     int formatType = -1;
-
-    // TODO: add Mnemonics, label, start address, and length, alongside decoding all of the above variables
 
     std::string get_instform()
     {
@@ -69,6 +66,7 @@ struct Instruction{
         } else if (formatType == 3) {
             unsigned char instruct;
             unsigned short instruct2 = disp;
+            unsigned short instruct2s = 0;
             instruct = get_OpEntry(op, prefix).opcode;
             if (n) {
                 instruct |= 2;
@@ -77,16 +75,31 @@ struct Instruction{
                 instruct |= 1;
             }
             if (x) {
-                instruct2 |= 0x8000;
+                if (disp >= 0)
+                    instruct2 |= 0x8000;
+                else
+                    instruct2s |= 0x8FFF;
             }
             if (b) {
-                instruct2 |= 0x4000;
+                if (disp >= 0)
+                    instruct2 |= 0x4000;
+                else
+                    instruct2s |= 0x4FFF;
             }
             if (p) {
-                instruct2 |= 0x2000;
+                if (disp >= 0)
+                    instruct2 |= 0x2000;
+                else
+                    instruct2s |= 0x2FFF;
             }
             if (e) {
-                instruct2 |= 0x1000;
+                if (disp >= 0)
+                    instruct2 |= 0x1000;
+                else
+                    instruct2s |= 0x1FFF;
+            }
+            if(disp< 0) {
+                instruct2 &= instruct2s;
             }
             
             sprintf(buffer, "%02x%04x", instruct, instruct2);

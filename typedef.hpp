@@ -35,14 +35,16 @@ struct SymEntry
 
 OpEntry get_OpEntry(std::string codename, char prefix);
 
-AddrEntry get_AddrEntry(std::string codename, char prefix);
+AddrEntry get_AddrEntry(std::string codename);
 
 void get_Format1(std::string op, std::string operand);
 
 void get_Format2(std::string op, std::string operand, int &r1, int &r2);
 
-void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, unsigned int &disp);
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp);
 
 int findValue(std::string currOperand, Symtab symtab);
+
+void findLitValue(std::string operand, std::string &literal, unsigned long &value, unsigned long &length);
 
 #endif
