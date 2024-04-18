@@ -19,6 +19,7 @@ std::string get_op(std::string line, char &prefix)
     iss >> op;
     if (line[9] == '+' || line[9] == '=') {
         prefix = line[9];
+        cout << prefix << " \n";
     } else if(line[9] != '+') {
         prefix = '@';
     }
@@ -53,5 +54,5 @@ std::string get_label(std::string line)
 
 std::string get_instform()
 {
-    
+
 }

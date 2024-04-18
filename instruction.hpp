@@ -17,8 +17,9 @@ std::string get_label(std::string line);
 struct Instruction{
     Instruction (std::string line) : line(line), op(get_op(line, prefix)), operand(get_operand(line, preop)){
         OpEntry entry = get_OpEntry(op, prefix);
-        formatType = entry.form;
         if (entry.codename == op){
+            formatType = entry.form;
+            cout << formatType << " " << op << " |" << prefix << "| " << preop << " \n";
             //the get_Format functions take the op and operand and change the class's values
             if(entry.form == 1) {
                 get_Format1(op, operand);
@@ -88,7 +89,7 @@ struct Instruction{
             }
             
             sprintf(buffer, "%02x%04x", instruct, instruct2);
-            cout << instruct << " \n";
+          
         } else if (formatType == 4) {
             unsigned char instruct;
             unsigned int instruct2 = disp;
@@ -113,7 +114,7 @@ struct Instruction{
             }
             
             sprintf(buffer, "%02x%06x", instruct, instruct2);
-            cout << instruct << " \n";
+         
         } 
 
         std::string result = buffer;
