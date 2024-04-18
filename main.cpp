@@ -25,8 +25,24 @@ Symtab symtab;
 bool baseSet;
 int baseAddr;
 
-int main() {
+int main(/*  int argc, char const * argv[]  */) {
 
+    /* std::vector<std::string> files;
+    int filecounter = 0; */
+
+    /* for (auto s:files) {
+        string flnm = files[filecounter];
+
+        bool ok = first_pass(symtab, flnm);
+        if(!ok) {
+            return 1;
+        }
+        ok = second_pass(symtab, flnm);
+        if(!ok) {
+            return 1;
+        }
+        filecounter+=1;
+    } */
     string flnm = "data/files/P2sample.sic";
 
     bool ok = first_pass(symtab, flnm);
@@ -51,9 +67,7 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     std::vector<std::string> outlines;
     std::vector<std::string> outLit;
     
-    //TODO build a p2sample.l filename from flnm
-    /* std::filesystem::path listing_file{sicfile}, ext{"sic"};
-    listing_file.replace_extension(ext); */
+    //create the .l file and a way to add lines to it
     auto pos = flnm.find('.');
     string listing_file = flnm;
     listing_file = listing_file.substr(0, pos);
@@ -67,6 +81,7 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
     fprintf(fptr, "%-8s%-8s%-8s%-8s%-8s\n", "CSect", "Symbol", "Value", "LENGTH", "Flags");
     fprintf(fptr, "--------------------------------------\n");
 
+    //building the tables as long as there's still lines to read in file
     while(std::getline(sicfile, line)) {
         if (line[0] == '.') {
             continue;
@@ -78,6 +93,7 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
         std::string operand = get_operand(line, preop);
         OpEntry entry = get_OpEntry(op, prefix);
         std::string labelout, csectout = "";
+        Instruction instruct(line);
 
         if (label.size() > 0) {
             symtab.values[label] = run_total;
@@ -85,18 +101,24 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
             
         }
         
+        //If not literal, add to the first table, else add to second table
         if (labelout != "*") {
             if (labelout != "" && labelout != "*") {
-                sprintf(buffer, "%-8s%-8s%06x%-8s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
+                sprintf(buffer, "%-8s%-8s%06x%10s%-8s\n", csectout.c_str(), labelout.c_str(), run_total, "", "F");
                 outlines.push_back(buffer);
             }
         } else {
-            std::string holder = prefix + op;
-            sprintf(buffer, "%-8s%-8s%06x%-8i\n", holder.c_str(), "", run_total, entry.form);
+            op.erase(op.begin());
+            for (int i = 0; i < op.size(); i++) {
+                if (op[i] < 'A' || op[i] > 'Z' && op[i] < 'a'|| op[i] > 'z') {
+                    op.erase(i, 1);
+                }
+        }
+            sprintf(buffer, "%-8s%-8s%06x%02s%-8i\n", op.c_str(), instruct.get_instform().c_str(), run_total, "", entry.form);
             outLit.push_back(buffer);
         }
-        /* out << entry.codename <<  " " << entry.form << " ";
-        cout << "label = " << label << " " << std::hex << run_total << "\n";  */
+        
+        //figure out how many bytes we need for each line
         if (entry.codename == op){
            run_total += entry.form;
         } else {
@@ -183,9 +205,17 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
             } 
             
         }
+        
+        if (prefix > 1) {
+            sprintf(buffer, "%04x%04s%-8s%01c%-8s%-8s%04s%s\n", run_total, " ",  get_label(line).c_str(), instruct.prefix, instruct.op.c_str(), instruct.operand.c_str(), "", instruct.get_instform().c_str());
+        } else {
+            sprintf(buffer, "%04x%04s%-9s%-8s%-8s%04s%s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "", instruct.get_instform().c_str());
+        }
 
-        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%04s%s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "", instruct.get_instform().c_str());
         outl2.push_back(buffer);
+        if (instruct.op == "END") {
+            break;
+        }
     }
 
     auto pos = flnm.find('.');
@@ -199,7 +229,7 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
         return 0; 
     }
 
-    for (auto s:outl2 ) {
+    for (auto s:outl2) {
         fprintf(fptr, "%s", s.c_str());
     }
     

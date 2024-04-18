@@ -47,7 +47,4 @@ std::string get_label(std::string line)
     return label;
 }
 
-std::string get_instform()
-{
-
-}
+std::string get_instform();
