@@ -1,5 +1,5 @@
 // Source code for assignment 2
-// Connor Shands-Sparks - REDID:
+// Connor Shands-Sparks - REDID:826895362
 // Connor Symons - REDID:828475798
 
 #ifndef TYPEDEF_HPP
@@ -41,13 +41,7 @@ void get_Format1(std::string op, std::string operand);
 
 void get_Format2(std::string op, std::string operand, int &r1, int &r2);
 
-void get_Format3(std::string op, char prefix, std::string operand, char preop, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp);
-
-void get_AddrFormat1(std::string op, std::string operand /*, and so on- similar to r1 and r2 above*/);
-
-void get_AddrFormat0(std::string op, std::string operand /*, and so on- similar to r1 and r2 above*/);
-
-void get_AddrFormat3(std::string op, std::string operand  /*, and so on- similar to r1 and r2 above*/);
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, unsigned int &disp);
 
 int findValue(std::string currOperand, Symtab symtab);
 

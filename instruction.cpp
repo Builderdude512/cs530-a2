@@ -1,5 +1,5 @@
 // Source code for assignment 2
-// Connor Shands-Sparks - REDID:
+// Connor Shands-Sparks - REDID:826895362
 // Connor Symons - REDID:828475798
 
 #include "instruction.hpp"
@@ -19,8 +19,6 @@ std::string get_op(std::string line, char &prefix)
     iss >> op;
     if (line[9] == '+' || line[9] == '=') {
         prefix = line[9];
-    } else if(line[9] != '+') {
-        prefix = '@';
     }
     return op;
 }
@@ -34,8 +32,6 @@ std::string get_operand(std::string line, char &prefix)
     iss >> operand;
     if (line[18] == '@' || line[18] == '#') {
         prefix = line[18];
-    } else {
-        prefix = '0';
     }
     return operand;
 }
@@ -49,4 +45,9 @@ std::string get_label(std::string line)
     std::string label;
     iss >> label;
     return label;
+}
+
+std::string get_instform()
+{
+
 }

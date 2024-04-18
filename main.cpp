@@ -1,5 +1,5 @@
 // Source code for assignment 2
-// Connor Shands-Sparks - REDID:
+// Connor Shands-Sparks - REDID:826895362
 // Connor Symons - REDID:828475798
 
 #include <iostream>
@@ -138,7 +138,6 @@ bool first_pass(Symtab & /*symtab*/, string flnm)
 
 bool second_pass(Symtab & /*symtab*/, string flnm) 
 {
-    printf("second\n") ;
     fstream sicfile(flnm);
     // TODO: open file
     string line, line2;
@@ -185,12 +184,23 @@ bool second_pass(Symtab & /*symtab*/, string flnm)
             
         }
 
-        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%-8s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "");
+        sprintf(buffer, "%04x%04s%-8s%-8s%-8s%04s%s\n", run_total, " ", get_label(line).c_str(), instruct.op.c_str(), instruct.operand.c_str(), "", instruct.get_instform().c_str());
         outl2.push_back(buffer);
     }
 
+    auto pos = flnm.find('.');
+    string listing_file = flnm;
+    listing_file = listing_file.substr(0, pos);
+    listing_file += ".st";
+    FILE *fptr = fopen(listing_file.c_str(), "w"); 
+    if (fptr == NULL) 
+    { 
+        printf("Could not open %s\n", listing_file.c_str()); 
+        return 0; 
+    }
+
     for (auto s:outl2 ) {
-        cout << s;
+        fprintf(fptr, "%s", s.c_str());
     }
     
     return true;

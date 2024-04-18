@@ -1,5 +1,5 @@
 // Source code for assignment 2
-// Connor Shands-Sparks - REDID:
+// Connor Shands-Sparks - REDID:826895362
 // Connor Symons - REDID:828475798
 
 #include <iostream>
@@ -173,7 +173,8 @@ void get_Format2(std::string op, std::string operand, int &r1, int &r2) {
 
 //again assumes no whitespace
 //added linenum argument for PC-relative addressing
-void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, int &disp){
+//TODO: I changed disp to unsigned to make it run, but that MIGHT not be right
+void get_Format3(std::string op, char prefix, std::string operand, char preop, int linenum, bool &n, bool &i, bool &x, bool &b,bool &p, bool &e, unsigned int &disp) {
     std::string currOperand = operand;
     std::queue<string> operandArr;
     std::queue<char> operatorArr;
@@ -195,6 +196,7 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
     }
 
     //check for n
+    //TODO: are N and I backwards?
     if(preop == '@') {
         i = false;
     }
@@ -234,28 +236,19 @@ void get_Format3(std::string op, char prefix, std::string operand, char preop, i
 
     //get raw operand value
     m = findValue(currOperand, symtab);
-
+    
     //use raw value and flags to find disp
     //if base/PC relative, use correct case, otherwise use direct addressing (disp = raw value)
     if(b) {
         disp = m - baseAddr;
     } else  if (p) {
         //subtract PC value from raw value, which will be 3 more than the current line number
+        //TODO: this three looks incredibly suspicious, the address outputs are off by 3
         disp = m - (linenum + 3);
     }
     else {
         disp = m;
     }
-}
-
-void get_AddrFormat1(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
-}
-void get_AddrFormat0(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
-}
-void get_AddrFormat3(std::string /* op */, std::string /* operand */ /*, and so on- similar to r1 and r2 above*/) {
-
 }
 
 //helper method to process operand value
