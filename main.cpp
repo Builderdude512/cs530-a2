@@ -86,7 +86,7 @@ bool first_pass(string flnm)
         OpEntry entry = get_OpEntry(op);
         std::string labelout = "";
         Instruction instruct(run_total, line);
-        
+
 
         if (label.size() > 0) {
             symtab.values[label] = run_total;
@@ -130,7 +130,7 @@ bool first_pass(string flnm)
         if (entry.codename == op){
            run_total += entry.form;
         } else {
-            AddrEntry entry = get_AddrEntry(op, prefix);
+            AddrEntry entry = get_AddrEntry(op);
             if (entry.codename == "START") {
                 csectout = labelout;
                 run_total = 0;
@@ -197,7 +197,7 @@ bool second_pass(string flnm)
         std::string preopString(1, instruct.preop);
 
         if (entry.codename != op) {
-            AddrEntry entry = get_AddrEntry(op, prefix);
+            AddrEntry entry = get_AddrEntry(op);
             if(label == "*") {
                 unsigned long litValue = 0;
                 unsigned long length = 0;
@@ -225,7 +225,7 @@ bool second_pass(string flnm)
         if (entry.codename == op){
            run_total += entry.form;
         } else {
-            AddrEntry entry = get_AddrEntry(op, prefix);
+            AddrEntry entry = get_AddrEntry(op);
             if (entry.codename == "START") {
                 run_total = 0;
             } else if (entry.codename == "END") {

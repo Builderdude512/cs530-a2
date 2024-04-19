@@ -34,7 +34,7 @@ struct Instruction{
             }
         }
         else {
-            AddrEntry addrEntry = get_AddrEntry(op, prefix);
+            AddrEntry addrEntry = get_AddrEntry(op);
             // TODO: Make a parallel function to above with AddrEntry
         }
 
