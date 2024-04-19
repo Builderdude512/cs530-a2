@@ -14,11 +14,14 @@ std::string get_operand(std::string line, char &preop);
 
 std::string get_label(std::string line);
 
+std::string replaceUppercase(std::string instruction);
+
 struct Instruction{
-    Instruction (std::string line) : line(line){
+    Instruction (int run_total, std::string line) : line(line){
+        linenum = run_total;
         op = get_op(line, prefix);
         operand = get_operand(line, preop);
-        OpEntry entry = get_OpEntry(op, prefix);
+        OpEntry entry = get_OpEntry(op);
         if (entry.codename == op){
             formatType = entry.form;
             
@@ -51,7 +54,7 @@ struct Instruction{
     bool e = false;
     char prefix = 0;
     char preop = 0;
-    unsigned int disp = 0;
+    int disp = 0;
     int formatType = -1;
 
     // TODO: add Mnemonics, label, start address, and length, alongside decoding all of the above variables
@@ -63,13 +66,14 @@ struct Instruction{
         if (formatType == -1) {
             return "";
         } else if (formatType == 1) {
-            sprintf(buffer, "%02x", get_OpEntry(op, prefix).opcode);
+            sprintf(buffer, "%02x", get_OpEntry(op).opcode);
         } else if (formatType == 2) {
-            sprintf(buffer, "%02x%01x%01x", get_OpEntry(op, prefix).opcode, r1, r2);
+            sprintf(buffer, "%02x%01x%01x", get_OpEntry(op).opcode, r1, r2);
         } else if (formatType == 3) {
             unsigned char instruct;
             unsigned short instruct2 = disp;
-            instruct = get_OpEntry(op, prefix).opcode;
+            unsigned short instruct2s = 0;
+            instruct = get_OpEntry(op).opcode;
             if (n) {
                 instruct |= 2;
             }
@@ -77,16 +81,31 @@ struct Instruction{
                 instruct |= 1;
             }
             if (x) {
-                instruct2 |= 0x8000;
+                if (disp >= 0)
+                    instruct2 |= 0x8000;
+                else
+                    instruct2s |= 0x8FFF;
             }
             if (b) {
-                instruct2 |= 0x4000;
+                if (disp >= 0)
+                    instruct2 |= 0x4000;
+                else
+                    instruct2s |= 0x4FFF;
             }
             if (p) {
-                instruct2 |= 0x2000;
+                if (disp >= 0)
+                    instruct2 |= 0x2000;
+                else
+                    instruct2s |= 0x2FFF;
             }
             if (e) {
-                instruct2 |= 0x1000;
+                if (disp >= 0)
+                    instruct2 |= 0x1000;
+                else
+                    instruct2s |= 0x1FFF;
+            }
+            if(disp< 0) {
+                instruct2 &= instruct2s;
             }
             
             sprintf(buffer, "%02x%04x", instruct, instruct2);
@@ -94,7 +113,7 @@ struct Instruction{
         } else if (formatType == 4) {
             unsigned char instruct;
             unsigned int instruct2 = disp;
-            instruct = get_OpEntry(op, prefix).opcode;
+            instruct = get_OpEntry(op).opcode;
             if (n) {
                 instruct |= 2;
             }
